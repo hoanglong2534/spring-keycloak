@@ -19,3 +19,9 @@ spring:
 
 server:
   port: 8999
+
+idp:
+  url: http://localhost:8180
+  realm: demo-keycloak
+  client-id: demo-spring-keycloak
+  client-secret: sph38LLsDkL3a1s6d25LeMzjI5JGmMkY

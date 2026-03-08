@@ -1,11 +1,12 @@
 package com.keycloak.keycloak.controller;
 
 
+
+import com.keycloak.keycloak.dto.request.CreateUserDTO;
 import com.keycloak.keycloak.entity.User;
+import com.keycloak.keycloak.service.KeyCloakAdminService;
 import com.keycloak.keycloak.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final KeyCloakAdminService keyCloakAdminService;
 
     @GetMapping("/{keycloakId}")
     public User getUser(@PathVariable String keycloakId){
@@ -26,9 +28,13 @@ public class UserController {
         return userService.updateUser(userUpdate, keycloakId);
     }
 
-    @PostMapping
-    public User create(@AuthenticationPrincipal Jwt jwt){
-        return userService.createUser(jwt);
+    @PostMapping("/create")
+    public User create(@RequestBody CreateUserDTO dto){
+        return keyCloakAdminService.createUser(
+                dto.getUsername(),
+                dto.getPassword(),
+                dto.getEmail()
+        );
     }
 
 }

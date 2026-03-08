@@ -14,16 +14,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User createUser(Jwt jwt) {
-        User user = new User();
-        user.setKeycloakId(jwt.getSubject()); // sub
-        user.setEmail(jwt.getClaimAsString("email"));
-        user.setUsername(jwt.getClaimAsString("preferred_username"));
-
-        return userRepository.save(user);
-    }
-
-    @Override
     public User updateUser(User userUpdate, String keycloakId) {
         User user = userRepository.findByKeycloakId(keycloakId);
         if (user == null) {
