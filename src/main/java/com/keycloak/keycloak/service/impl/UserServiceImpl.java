@@ -1,5 +1,6 @@
 package com.keycloak.keycloak.service.impl;
 
+import com.keycloak.keycloak.dto.request.UpdateUserDTO;
 import com.keycloak.keycloak.entity.User;
 import com.keycloak.keycloak.repository.UserRepository;
 import com.keycloak.keycloak.service.UserService;
@@ -14,7 +15,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User updateUser(User userUpdate, String keycloakId) {
+    public User updateUser(UpdateUserDTO userUpdate, String keycloakId) {
         User user = userRepository.findByKeycloakId(keycloakId);
         if (user == null) {
            throw new RuntimeException("User not found");

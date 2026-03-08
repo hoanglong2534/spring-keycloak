@@ -24,7 +24,7 @@ public class KeyCloakAdminServiceImpl implements KeyCloakAdminService {
     private final UserRepository userRepository;
 
     @Override
-    public User createUser(String username, String password, String email) {
+    public User createUser(String username, String password, String email, String firstName, String lastName) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(username);
         userRepresentation.setEmail(email);
@@ -33,7 +33,10 @@ public class KeyCloakAdminServiceImpl implements KeyCloakAdminService {
         CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
         credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
         credentialRepresentation.setValue(password);
+        userRepresentation.setFirstName(firstName);
+        userRepresentation.setLastName(lastName);
         credentialRepresentation.setTemporary(false);
+        userRepresentation.setEmailVerified(true);
         userRepresentation.setCredentials(List.of(credentialRepresentation));
 
         Response userResponse = keycloak.realm(realm).users().create(userRepresentation);
