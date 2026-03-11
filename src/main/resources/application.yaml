@@ -25,3 +25,11 @@ idp:
   realm: demo-keycloak
   client-id: demo-spring-keycloak
   client-secret: sph38LLsDkL3a1s6d25LeMzjI5JGmMkY
+
+minio:
+  access:
+    name: longpxh
+    secret: longpxh@123
+  bucket:
+    name: avatar-user
+  url: http://localhost:9000
