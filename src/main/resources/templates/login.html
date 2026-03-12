@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Auth - Login</title>
+</head>
+
+<body>
+
+    <div id="loginSection">
+        <h2>Login</h2>
+        <input type="text" id="logUsername" placeholder="Username">
+        <input type="password" id="logPassword" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <button onclick="window.location.href='/register'">Go to Register</button>
+        <p id="logMsg"></p>
+    </div>
+
+    <script>
+        const kcTokenUrl = 'http://localhost:8180/realms/demo-keycloak/protocol/openid-connect/token';
+        const kcClientId = 'demo-spring-keycloak';
+        const kcClientSecret = 'sph38LLsDkL3a1s6d25LeMzjI5JGmMkY';
+
+        window.onload = function () {
+            if (localStorage.getItem('access_token')) {
+                window.location.href = '/profile';
+            }
+        }
+
+        async function login() {
+            const msg = document.getElementById('logMsg');
+            msg.innerText = "Logging in...";
+            const params = new URLSearchParams({
+                client_id: kcClientId,
+                client_secret: kcClientSecret,
+                grant_type: 'password',
+                username: document.getElementById('logUsername').value,
+                password: document.getElementById('logPassword').value
+            });
+            try {
+                const res = await fetch(kcTokenUrl, { method: 'POST', body: params });
+                if (!res.ok) throw new Error('Login failed');
+                const data = await res.json();
+                localStorage.setItem('access_token', data.access_token);
+                window.location.href = '/profile';
+            } catch (e) {
+                msg.innerText = e.message;
+                msg.style.color = "red";
+            }
+        }
+    </script>
+</body>
+
+</html>

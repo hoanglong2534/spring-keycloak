@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Auth - Profile</title>
+</head>
+
+<body>
+
+    <div id="profileSection">
+        <h2>Profile</h2>
+        <p><b>User:</b> <span id="pUser"></span></p>
+        <p><b>Email:</b> <span id="pEmail"></span></p>
+
+        <div>
+            <img id="usrAvatar" src="" width="100" style="display:none;"><br>
+            <input type="file" id="avatarInput">
+        </div>
+
+        <p><b>Address:</b> <input type="text" id="pAddress" placeholder="Enter your address"></p>
+
+        <button onclick="updateProfile()">Save Profile (Avatar & Address)</button>
+        <p id="upMsg"></p>
+    </div>
+
+    <script>
+        window.onload = function () {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = '/';
+            } else {
+                fetchProfile(token);
+            }
+        }
+
+        async function fetchProfile(token) {
+            try {
+                const res = await fetch('/users/profile', { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error("Please Login");
+                const user = await res.json();
+
+                document.getElementById('pUser').innerText = user.username || "";
+                document.getElementById('pEmail').innerText = user.email || "";
+                document.getElementById('pAddress').value = user.address || "";
+
+                if (user.avatar) {
+                    document.getElementById('usrAvatar').src = user.avatar;
+                    document.getElementById('usrAvatar').style.display = 'block';
+                    window.currentAvatar = user.avatar;
+                }
+            } catch (e) {
+                window.location.href = '/401';
+            }
+        }
+
+        async function updateProfile() {
+            const msg = document.getElementById('upMsg');
+            msg.innerText = "Saving...";
+            const token = localStorage.getItem('access_token');
+            const file = document.getElementById('avatarInput').files[0];
+            let avatarUrl = window.currentAvatar || "";
+
+            try {
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const upRes = await fetch('/users/upload-avatar', {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    if (!upRes.ok) throw new Error("Upload avatar failed");
+                    avatarUrl = await upRes.text();
+                }
+
+                const payload = {
+                    address: document.getElementById('pAddress').value,
+                    avatar: avatarUrl
+                };
+
+                const updateRes = await fetch('/users/update', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                if (!updateRes.ok) throw new Error("Update profile failed");
+
+                msg.innerText = "Profile updated successfully!";
+                msg.style.color = "green";
+                if (avatarUrl) {
+                    document.getElementById('usrAvatar').src = avatarUrl;
+                    document.getElementById('usrAvatar').style.display = 'block';
+                    window.currentAvatar = avatarUrl;
+                }
+            } catch (e) {
+                msg.innerText = e.message;
+                msg.style.color = "red";
+            }
+        }
+    </script>
+</body>
+
+</html>

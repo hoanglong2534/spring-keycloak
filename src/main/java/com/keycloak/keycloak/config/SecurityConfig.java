@@ -27,7 +27,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/users/create").permitAll()
+                        .requestMatchers("/", "/users/create", "/login", "/register", "/401", "/profile").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(customizerUtil.jwtCustomizer));
